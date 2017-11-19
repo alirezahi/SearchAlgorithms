@@ -1,7 +1,9 @@
+from Problem import *
 class Graph():
-    def __init__(self):
+    def __init__(self,problem):
         self.nodes = list()
         self.edges = dict()
+        self.problem = problem
 
     def insert(self,primary_node,second_node=None,weight=-1):
         if primary_node:
@@ -27,8 +29,13 @@ class Graph():
         while queue:
             current_node = queue.pop(0)
             print(current_node)
+            if self.problem.goal_test(current_node):
+                print('FOUND!!!')
+                return
             if current_node not in visited:
                 visited.add(current_node)
+                for node in self.problem.actions(current_node):
+                    self.insert(current_node,node)
                 queue.extend(set(self.edges[current_node].keys()) - visited)
         return visited
     
@@ -43,11 +50,13 @@ class Graph():
             print(current_node)
             if current_node not in visited:
                 visited.add(current_node)
+                for node in self.problem.actions(current_node):
+                    self.insert(current_node, node)
                 nodes_stack.extend(set(self.edges[current_node].keys()) - visited)
         return visited
 
-            
-g = Graph()
-g.insert('a','b',10)
-g.insert('a','c',20)
-g.insert('b','d',10)
+
+p = Problem()
+g = Graph(p)
+g.insert((0,0))
+g.bfs((0,0))
