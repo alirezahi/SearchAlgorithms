@@ -43,8 +43,7 @@ class Graph():
         if start is None or start not in self.nodes:
             return None
         visited = set()
-        nodes_stack = list()
-        nodes_stack.append(start)
+        nodes_stack = [start]
         while nodes_stack:
             current_node = nodes_stack.pop()
             print(current_node)
