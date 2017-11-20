@@ -92,8 +92,50 @@ class Graph():
             nodes_stack.extend(set(self.edges[current_node].keys()))
         return
 
+    def dfs_graph_limited_search(self, start,depth=0):
+        self.__init__(self.problem)
+        self.nodes = [(self.problem.initial_state(), 0)]
+        self.edges[(self.problem.initial_state(), 0)] = dict()
+        if start is None or start not in [x[0] for x in self.nodes]:
+            return None
+        visited = set()
+        nodes_stack = [(start,0)]
+        while nodes_stack:
+            current_node = nodes_stack.pop()
+            print(current_node)
+            if self.problem.goal_test(current_node[0]):
+                print('FOUND!!!')
+                return
+            if current_node[0] not in [x[0] for x in visited]:
+                visited.add(current_node)
+                if current_node[1] != depth:
+                    for node in self.problem.actions(current_node[0]):
+                        self.insert(current_node, (node,current_node[1]+1))
+                    nodes_stack.extend(set(self.edges[current_node].keys()) - visited)
+        return visited
+
+    def dfs_tree_limited_search(self, start,depth=0):
+        self.__init__(self.problem)
+        self.nodes = [(self.problem.initial_state(), 0)]
+        self.edges[(self.problem.initial_state(), 0)] = dict()
+        if start is None or start not in [x[0] for x in self.nodes]:
+            return None
+        nodes_stack = [start]
+        while nodes_stack:
+            current_node = nodes_stack.pop()
+            print(current_node)
+            if self.problem.goal_test(current_node[0]):
+                print('FOUND!!!')
+                return
+            if current_node[1] != depth:
+                for node in self.problem.actions(current_node[0]):
+                    self.insert(current_node, (node, current_node[1] + 1))
+                nodes_stack.extend(set(self.edges[current_node].keys()))
+        return
+
 
 p = Problem()
 g = Graph(p)
-g.bfs_graph_search((0,0))
-g.dfs_graph_search((0,0))
+# g.bfs_graph_search((0,0))
+# g.dfs_graph_search((0,0))
+g.dfs_graph_limited_search((0,0),6)
