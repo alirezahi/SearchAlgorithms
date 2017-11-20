@@ -1,12 +1,24 @@
 class Problem():
     def initial_state(self):
         return (0,0)
-    def actions(self,state):
+    def actions(self,state,straight=True):
         result_states = []
-        result_states.append((4, state[1]))
-        result_states.append((state[0], 3))
-        result_states.append((0, state[1]))
-        result_states.append((state[0], 0))
+        if straight:
+            result_states.append((4, state[1]))
+            result_states.append((state[0], 3))
+            result_states.append((0, state[1]))
+            result_states.append((state[0], 0))
+            result_states.append((min(4, state[0] + state[1]), state[0] + state[1] - min(4, state[0] + state[1])))
+            result_states.append((state[0] + state[1] - min(3, state[0] + state[1]), min(3, state[0] + state[1])))
+            return list(set(result_states))
+        if state[0] == 0:
+            result_states.append((4, state[1]))
+        if state[1] == 0:
+            result_states.append((state[0], 3))
+        if state[0] == 4:
+            result_states.append((0, state[1]))
+        if state[1] == 3:
+            result_states.append((state[0], 0))
         result_states.append((min(4, state[0] + state[1]), state[0] + state[1] - min(4, state[0] + state[1])))
         result_states.append((state[0] + state[1] - min(3, state[0] + state[1]), min(3, state[0] + state[1])))
         return list(set(result_states))
