@@ -31,7 +31,7 @@ class Graph():
         while queue:
             current_node = queue.pop(0)
             print(current_node)
-            if self.problem.goal_test(current_node):
+            if self.problem.is_goal_test(current_node):
                 print('FOUND!!!')
                 return
             if current_node not in visited:
@@ -49,7 +49,7 @@ class Graph():
         while queue:
             current_node = queue.pop(0)
             print(current_node)
-            if self.problem.goal_test(current_node):
+            if self.problem.is_goal_test(current_node):
                 print('FOUND!!!')
                 return
             for node in self.problem.actions(current_node):
@@ -66,7 +66,7 @@ class Graph():
         while nodes_stack:
             current_node = nodes_stack.pop()
             print(current_node)
-            if self.problem.goal_test(current_node):
+            if self.problem.is_goal_test(current_node):
                 print('FOUND!!!')
                 return
             if current_node not in visited:
@@ -84,7 +84,7 @@ class Graph():
         while nodes_stack:
             current_node = nodes_stack.pop()
             print(current_node)
-            if self.problem.goal_test(current_node):
+            if self.problem.is_goal_test(current_node):
                 print('FOUND!!!')
                 return
             for node in self.problem.actions(current_node):
@@ -103,7 +103,7 @@ class Graph():
         while nodes_stack:
             current_node = nodes_stack.pop()
             print(current_node)
-            if self.problem.goal_test(current_node[0]):
+            if self.problem.is_goal_test(current_node[0]):
                 print('FOUND!!!')
                 return
             if current_node[0] not in [x[0] for x in visited]:
@@ -124,7 +124,7 @@ class Graph():
         while nodes_stack:
             current_node = nodes_stack.pop()
             print(current_node)
-            if self.problem.goal_test(current_node[0]):
+            if self.problem.is_goal_test(current_node[0]):
                 print('FOUND!!!')
                 return
             if current_node[1] != depth:
@@ -132,6 +132,33 @@ class Graph():
                     self.insert(current_node, (node, current_node[1] + 1))
                 nodes_stack.extend(set(self.edges[current_node].keys()))
         return
+
+    def bidirectional_graph_search(self,start):
+        #this part of code is not complete and has to be completed!!!!!!!!!!
+        self.__init__(self.problem)
+        self.nodes = [self.problem.initial_state()]
+        self.edges[self.problem.initial_state()] = dict()
+        #adding destination node to start from there and reach to the start node
+        dest_nodes = list()
+        dest_nodes.extend(self.problem.goal_tests())
+        dest_edges = dict()
+        if start is None or start not in self.nodes:
+            return None
+        visited = set()
+        nodes_stack = [start]
+        while nodes_stack:
+            current_node = nodes_stack.pop()
+            print(current_node)
+            if self.problem.is_goal_test(current_node):
+                print('FOUND!!!')
+                return
+            if current_node not in visited:
+                visited.add(current_node)
+                for node in self.problem.actions(current_node):
+                    self.insert(current_node, node)
+                nodes_stack.extend(
+                    set(self.edges[current_node].keys()) - visited)
+        return visited
 
 
 p = Problem()
