@@ -42,3 +42,6 @@ class Problem():
 
     def path_cost():
         return 0
+
+    def edge_cost(father_state,child_state):
+        return 1
