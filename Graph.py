@@ -128,6 +128,7 @@ class Graph():
                 print('FOUND!!!')
                 return
             if current_node[1] != depth:
+                print(current_node)
                 for node in self.problem.actions(current_node[0]):
                     self.insert(current_node, (node, current_node[1] + 1))
                 nodes_stack.extend(set(self.edges[current_node].keys()))
@@ -160,6 +161,27 @@ class Graph():
                     set(self.edges[current_node].keys()) - visited)
         return visited
 
+    def UCS_graph_search(self, start):
+        self.__init__(self.problem)
+        self.nodes = [self.problem.initial_state()]
+        self.edges[self.problem.initial_state()] = dict()
+        visited = set()
+        #defining list for nodes, [node,g(n)]
+        nodes = [[start, 0]]
+        while nodes:
+            current_node = min(nodes, key=lambda k: k[1])
+            print_table(current_node)
+            visited.add(current_node[0])
+            if p.is_goal_test(current_node[0]):
+                return current_node[0]
+            for node in list(set(self.problem.actions(current_node[0])) - visited):
+                cost = self.problem.edge_cost(current_node[0], node)
+                self.insert(current_node[0], node, cost)
+                current_cost = list(filter(lambda element: element[0] == current_node[0], nodes))[0][1] + cost
+                nodes.append([node, current_cost])
+            nodes.remove(current_node)
+
+
     def A_Star_graph_search(self,start):
         self.__init__(self.problem)
         self.nodes = [self.problem.initial_state()]
@@ -186,11 +208,12 @@ def print_table(current_node):
         for j in i:
             print(j, end=' ')
         print()
-    print([current_node[1], current_node[2]])
+    # print([current_node[1], current_node[2]])
+    print([current_node[1]])
 
 p = Problem()
 g = Graph(p)
-g.A_Star_graph_search(p.initial_state())
-# g.bfs_graph_search((0,0))
+# g.A_Star_graph_search(p.initial_state())
+g.UCS_graph_search(p.initial_state())
 # g.dfs_graph_search((0,0))
 # g.dfs_graph_limited_search((0,0),6)
