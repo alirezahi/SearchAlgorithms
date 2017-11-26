@@ -1,4 +1,4 @@
-from 'Sliding Puzzle.Problems' import *
+from SlidingPuzzle import *
 class Graph():
     def __init__(self,problem):
         self.nodes = [problem.initial_state()]
