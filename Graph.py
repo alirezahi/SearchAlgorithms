@@ -1,4 +1,4 @@
-from Problem import *
+from 'Sliding Puzzle.Problems' import *
 class Graph():
     def __init__(self,problem):
         self.nodes = [problem.initial_state()]
@@ -160,9 +160,37 @@ class Graph():
                     set(self.edges[current_node].keys()) - visited)
         return visited
 
+    def A_Star_graph_search(self,start):
+        self.__init__(self.problem)
+        self.nodes = [self.problem.initial_state()]
+        self.edges[self.problem.initial_state()] = dict()
+        visited = set()
+        #defining list for nodes, [node,g(n),h(n)+g(n)]
+        nodes = [[start,0,0]]
+        while nodes:
+            current_node = min(nodes, key = lambda k : k[2])
+            print_table(current_node)
+            visited.add(current_node[0])
+            if p.is_goal_test(current_node[0]):
+                return current_node[0]
+            for node in list(set(self.problem.actions(current_node[0])) - visited):
+                cost = self.problem.edge_cost(current_node[0],node)
+                self.insert(current_node[0],node,cost)
+                current_cost = list(filter(lambda element: element[0] == current_node[0],nodes))[0][1] + cost
+                nodes.append([node,current_cost,current_cost + self.problem.heuristic(node)])
+            nodes.remove(current_node)
+                
+                
+def print_table(current_node):
+    for i in current_node[0]:
+        for j in i:
+            print(j, end=' ')
+        print()
+    print([current_node[1], current_node[2]])
 
 p = Problem()
 g = Graph(p)
+g.A_Star_graph_search(p.initial_state())
 # g.bfs_graph_search((0,0))
 # g.dfs_graph_search((0,0))
-g.dfs_graph_limited_search((0,0),6)
+# g.dfs_graph_limited_search((0,0),6)
