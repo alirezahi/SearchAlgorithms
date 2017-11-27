@@ -181,6 +181,25 @@ class Graph():
                 nodes.append([node, current_cost])
             nodes.remove(current_node)
 
+    def UCS_tree_search(self, start):
+        self.__init__(self.problem)
+        self.nodes = [self.problem.initial_state()]
+        self.edges[self.problem.initial_state()] = dict()
+        #defining list for nodes, [node,g(n)]
+        nodes = [[start, 0]]
+        while nodes:
+            current_node = min(nodes, key=lambda k: k[1])
+            print_table(current_node)
+            if p.is_goal_test(current_node[0]):
+                return current_node[0]
+            for node in list(set(self.problem.actions(current_node[0]))):
+                cost = self.problem.edge_cost(current_node[0], node)
+                self.insert(current_node[0], node, cost)
+                current_cost = list(
+                    filter(lambda element: element[0] == current_node[0], nodes))[0][1] + cost
+                nodes.append([node, current_cost])
+            nodes.remove(current_node)
+
 
     def A_Star_graph_search(self,start):
         self.__init__(self.problem)
@@ -200,6 +219,26 @@ class Graph():
                 self.insert(current_node[0],node,cost)
                 current_cost = list(filter(lambda element: element[0] == current_node[0],nodes))[0][1] + cost
                 nodes.append([node,current_cost,current_cost + self.problem.heuristic(node)])
+            nodes.remove(current_node)
+    
+    def A_Star_tree_search(self, start):
+        self.__init__(self.problem)
+        self.nodes = [self.problem.initial_state()]
+        self.edges[self.problem.initial_state()] = dict()
+        #defining list for nodes, [node,g(n),h(n)+g(n)]
+        nodes = [[start, 0, 0]]
+        while nodes:
+            current_node = min(nodes, key=lambda k: k[2])
+            print_table(current_node)
+            if p.is_goal_test(current_node[0]):
+                return current_node[0]
+            for node in list(set(self.problem.actions(current_node[0]))):
+                cost = self.problem.edge_cost(current_node[0], node)
+                self.insert(current_node[0], node, cost)
+                current_cost = list(
+                    filter(lambda element: element[0] == current_node[0], nodes))[0][1] + cost
+                nodes.append([node, current_cost, current_cost +
+                              self.problem.heuristic(node)])
             nodes.remove(current_node)
                 
                 
