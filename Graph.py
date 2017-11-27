@@ -5,6 +5,7 @@ class Graph():
         self.edges = dict()
         self.edges[problem.initial_state()] = dict()
         self.problem = problem
+        self.parent = {}
 
     def insert(self,primary_node,second_node=None,weight=-1):
         if primary_node:
@@ -22,6 +23,12 @@ class Graph():
             self.edges[second_node][primary_node] = weight
         return None
 
+    def print_path(self,start):
+        path_node = start
+        while path_node:
+            print(path_node)
+            path_node = self.parent[path_node] if path_node in self.parent else None
+
     def bfs_graph_search(self,start):
         self.__init__(self.problem)
         if start is None or start not in self.nodes:
@@ -30,14 +37,14 @@ class Graph():
         queue = [start]
         while queue:
             current_node = queue.pop(0)
-            print(current_node)
             if self.problem.is_goal_test(current_node):
-                print('FOUND!!!')
+                self.print_path(current_node)
                 return
             if current_node not in visited:
                 visited.add(current_node)
-                for node in self.problem.actions(current_node):
+                for node in list(set(self.problem.actions(current_node))-visited):
                     self.insert(current_node,node)
+                    self.parent[node] = current_node
                 queue.extend(set(self.edges[current_node].keys()) - visited)
         return visited
 
@@ -48,12 +55,12 @@ class Graph():
         queue = [start]
         while queue:
             current_node = queue.pop(0)
-            print(current_node)
             if self.problem.is_goal_test(current_node):
-                print('FOUND!!!')
+                self.print_path(current_node)
                 return
             for node in self.problem.actions(current_node):
                 self.insert(current_node, node)
+                self.parent[node] = current_node
             queue.extend(set(self.edges[current_node].keys()))
         return
     
@@ -65,14 +72,14 @@ class Graph():
         nodes_stack = [start]
         while nodes_stack:
             current_node = nodes_stack.pop()
-            print(current_node)
             if self.problem.is_goal_test(current_node):
-                print('FOUND!!!')
+                self.print_path(current_node)
                 return
             if current_node not in visited:
                 visited.add(current_node)
-                for node in self.problem.actions(current_node):
+                for node in list(set(self.problem.actions(current_node))-visited):
                     self.insert(current_node, node)
+                    self.parent[node] = current_node
                 nodes_stack.extend(set(self.edges[current_node].keys()) - visited)
         return visited
 
@@ -85,10 +92,11 @@ class Graph():
             current_node = nodes_stack.pop()
             print(current_node)
             if self.problem.is_goal_test(current_node):
-                print('FOUND!!!')
+                self.print_path(current_node)
                 return
             for node in self.problem.actions(current_node):
                 self.insert(current_node, node)
+                self.parent[node] = current_node
             nodes_stack.extend(set(self.edges[current_node].keys()))
         return
 
@@ -102,15 +110,15 @@ class Graph():
         nodes_stack = [(start,0)]
         while nodes_stack:
             current_node = nodes_stack.pop()
-            print(current_node)
             if self.problem.is_goal_test(current_node[0]):
-                print('FOUND!!!')
+                self.print_path(current_node[0])
                 return
             if current_node[0] not in [x[0] for x in visited]:
                 visited.add(current_node)
                 if current_node[1] != depth:
-                    for node in self.problem.actions(current_node[0]):
+                    for node in list(set(self.problem.actions(current_node[0])) - set([x[0] for x in visited])):
                         self.insert(current_node, (node,current_node[1]+1))
+                        self.parent[node] = current_node[0]
                     nodes_stack.extend(set(self.edges[current_node].keys()) - visited)
         return visited
 
@@ -123,14 +131,13 @@ class Graph():
         nodes_stack = [start]
         while nodes_stack:
             current_node = nodes_stack.pop()
-            print(current_node)
             if self.problem.is_goal_test(current_node[0]):
-                print('FOUND!!!')
+                self.print_path(current_node[0])
                 return
             if current_node[1] != depth:
-                print(current_node)
                 for node in self.problem.actions(current_node[0]):
                     self.insert(current_node, (node, current_node[1] + 1))
+                    self.parent[node] = current_node[0]
                 nodes_stack.extend(set(self.edges[current_node].keys()))
         return
 
@@ -170,13 +177,14 @@ class Graph():
         nodes = [[start, 0]]
         while nodes:
             current_node = min(nodes, key=lambda k: k[1])
-            print_table(current_node)
             visited.add(current_node[0])
             if p.is_goal_test(current_node[0]):
+                self.print_path(current_node[0])
                 return current_node[0]
             for node in list(set(self.problem.actions(current_node[0])) - visited):
                 cost = self.problem.edge_cost(current_node[0], node)
                 self.insert(current_node[0], node, cost)
+                self.parent[node] = current_node[0]
                 current_cost = list(filter(lambda element: element[0] == current_node[0], nodes))[0][1] + cost
                 nodes.append([node, current_cost])
             nodes.remove(current_node)
@@ -189,14 +197,14 @@ class Graph():
         nodes = [[start, 0]]
         while nodes:
             current_node = min(nodes, key=lambda k: k[1])
-            print_table(current_node)
             if p.is_goal_test(current_node[0]):
+                self.print_path(current_node[0])
                 return current_node[0]
             for node in list(set(self.problem.actions(current_node[0]))):
                 cost = self.problem.edge_cost(current_node[0], node)
                 self.insert(current_node[0], node, cost)
-                current_cost = list(
-                    filter(lambda element: element[0] == current_node[0], nodes))[0][1] + cost
+                self.parent[node] = current_node[0]
+                current_cost = list(filter(lambda element: element[0] == current_node[0], nodes))[0][1] + cost
                 nodes.append([node, current_cost])
             nodes.remove(current_node)
 
@@ -210,13 +218,14 @@ class Graph():
         nodes = [[start,0,0]]
         while nodes:
             current_node = min(nodes, key = lambda k : k[2])
-            print_table(current_node)
             visited.add(current_node[0])
             if p.is_goal_test(current_node[0]):
+                self.print_path(current_node[0])
                 return current_node[0]
             for node in list(set(self.problem.actions(current_node[0])) - visited):
                 cost = self.problem.edge_cost(current_node[0],node)
                 self.insert(current_node[0],node,cost)
+                self.parent[node] = current_node[0]
                 current_cost = list(filter(lambda element: element[0] == current_node[0],nodes))[0][1] + cost
                 nodes.append([node,current_cost,current_cost + self.problem.heuristic(node)])
             nodes.remove(current_node)
@@ -231,12 +240,13 @@ class Graph():
             current_node = min(nodes, key=lambda k: k[2])
             print_table(current_node)
             if p.is_goal_test(current_node[0]):
+                self.print_path(current_node[0])
                 return current_node[0]
             for node in list(set(self.problem.actions(current_node[0]))):
                 cost = self.problem.edge_cost(current_node[0], node)
                 self.insert(current_node[0], node, cost)
-                current_cost = list(
-                    filter(lambda element: element[0] == current_node[0], nodes))[0][1] + cost
+                self.parent[node] = current_node[0]
+                current_cost = list(filter(lambda element: element[0] == current_node[0], nodes))[0][1] + cost
                 nodes.append([node, current_cost, current_cost +
                               self.problem.heuristic(node)])
             nodes.remove(current_node)
@@ -253,6 +263,6 @@ def print_table(current_node):
 p = Problem()
 g = Graph(p)
 # g.A_Star_graph_search(p.initial_state())
-g.UCS_graph_search(p.initial_state())
+g.A_Star_graph_search(p.initial_state())
 # g.dfs_graph_search((0,0))
 # g.dfs_graph_limited_search((0,0),6)
