@@ -1,9 +1,10 @@
+from Graph import *
 class Problem():
 
     def initial_state(self):
-        return ((0,8,2),
-                (5,4,3),
-                (6,7,1)
+        return ((3,1,2),
+                (4,0,7),
+                (6,8,5)
                 )
 
 
@@ -61,3 +62,9 @@ class Problem():
 
     def heuristic(self,state):
         return sum([sum([abs(state.index(j[0]) - int((element) / 3)) + abs(j[0].index(element)-element%3) for element in j[0]]) for j in [[value, index] for index, value in enumerate(state)]])
+
+p = Problem()
+g = Graph(p)
+g.bfs_graph_search(p.initial_state())
+g.dfs_graph_limited_search(p.initial_state(),depth=8)
+g.A_Star_graph_search(p.initial_state())
