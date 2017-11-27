@@ -1,3 +1,4 @@
+from Graph import *
 class Problem():
 
 
@@ -27,6 +28,8 @@ class Problem():
         result_states.append((state[0] + state[1] - min(3, state[0] + state[1]), min(3, state[0] + state[1])))
         return list(set(result_states))
 
+    def result(self,state,action,straight=True):
+        return None
 
     def is_goal_test(self,state):
         return state[0] == 2
@@ -45,3 +48,7 @@ class Problem():
 
     def edge_cost(father_state,child_state):
         return 1
+
+p = Problem()
+g = Graph(p)
+g.dfs_graph_search(p.initial_state())
