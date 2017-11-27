@@ -1,4 +1,4 @@
-from SlidingPuzzle import *
+from WaterJug import *
 class Graph():
     def __init__(self,problem):
         self.nodes = [problem.initial_state()]
@@ -141,7 +141,7 @@ class Graph():
                 nodes_stack.extend(set(self.edges[current_node].keys()))
         return
 
-    def bidirectional_graph_search(self,start):
+    def bidirectional_graph_search(self,start,goal):
         #this part of code is not complete and has to be completed!!!!!!!!!!
         self.__init__(self.problem)
         self.nodes = [self.problem.initial_state()]
@@ -153,9 +153,13 @@ class Graph():
         if start is None or start not in self.nodes:
             return None
         visited = set()
+        visited_second = set()
         nodes_stack = [start]
-        while nodes_stack:
+        nodes_second_stack = [goal]
+        while nodes_stack or nodes_second_stack:
             current_node = nodes_stack.pop()
+            print(current_node)
+            print('current_node')
             print(current_node)
             if self.problem.is_goal_test(current_node):
                 print('FOUND!!!')
@@ -164,8 +168,22 @@ class Graph():
                 visited.add(current_node)
                 for node in self.problem.actions(current_node):
                     self.insert(current_node, node)
-                nodes_stack.extend(
-                    set(self.edges[current_node].keys()) - visited)
+                nodes_stack.extend(set(self.edges[current_node].keys()) - visited)
+            current_node_second = nodes_second_stack.pop()
+            print(current_node_second)
+            print('current_node_second')
+            if current_node_second == self.problem.initial_state():
+                print('FOUND!!!')
+                return
+            if current_node_second not in visited_second:
+                visited_second.add(current_node_second)
+                for node in self.problem.actions(current_node_second,straight=False):
+                    self.insert(current_node_second, node)
+                nodes_second_stack.extend(set(self.edges[current_node_second].keys()) - visited_second)
+            common_nodes = (set(nodes_stack) | set(visited)) & (set(nodes_second_stack) | set(visited_second))
+            if len(common_nodes) > 0:
+                print('findout path :D')
+                return
         return visited
 
     def UCS_graph_search(self, start):
@@ -250,19 +268,10 @@ class Graph():
                 nodes.append([node, current_cost, current_cost +
                               self.problem.heuristic(node)])
             nodes.remove(current_node)
-                
-                
-def print_table(current_node):
-    for i in current_node[0]:
-        for j in i:
-            print(j, end=' ')
-        print()
-    # print([current_node[1], current_node[2]])
-    print([current_node[1]])
 
 p = Problem()
 g = Graph(p)
 # g.A_Star_graph_search(p.initial_state())
-g.A_Star_graph_search(p.initial_state())
+g.bidirectional_graph_search(p.initial_state(),p.goal_tests()[0])
 # g.dfs_graph_search((0,0))
 # g.dfs_graph_limited_search((0,0),6)
