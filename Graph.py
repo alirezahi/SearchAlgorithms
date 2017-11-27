@@ -1,4 +1,4 @@
-from SlidingPuzzle import *
+
 class Graph():
     def __init__(self,problem):
         self.nodes = [problem.initial_state()]
@@ -8,6 +8,7 @@ class Graph():
         self.parent = {}
         self.nodes_expanded_count = 1
         self.nodes_count = 1
+        self.max_nodes = []
 
     def insert(self,primary_node,second_node=None,weight=-1):
         if primary_node:
@@ -28,6 +29,7 @@ class Graph():
     def print_path(self,start):
         print('Nodes Expanded: ' + str(self.nodes_expanded_count))
         print('Nodes Visited: ' + str(self.nodes_count))
+        print('Memory Usage: ' + str(max(self.max_nodes)))
         path_node = start
         path_list = []
         while path_node:
@@ -44,6 +46,7 @@ class Graph():
         visited = set()
         queue = [start]
         while queue:
+            self.max_nodes.append(len(visited) + len(queue))
             current_node = queue.pop(0)
             self.nodes_expanded_count += 1
             if self.problem.is_goal_test(current_node):
@@ -64,6 +67,7 @@ class Graph():
             return None
         queue = [start]
         while queue:
+            self.max_nodes.append(len(queue))
             current_node = queue.pop(0)
             self.nodes_expanded_count += 1
             if self.problem.is_goal_test(current_node):
@@ -83,6 +87,7 @@ class Graph():
         visited = set()
         nodes_stack = [start]
         while nodes_stack:
+            self.max_nodes.append(len(visited) + len(nodes_stack))
             current_node = nodes_stack.pop()
             self.nodes_expanded_count += 1
             if self.problem.is_goal_test(current_node):
@@ -103,6 +108,7 @@ class Graph():
             return None
         nodes_stack = [start]
         while nodes_stack:
+            self.max_nodes.append(len(nodes_stack))
             current_node = nodes_stack.pop()
             self.nodes_expanded_count += 1
             if self.problem.is_goal_test(current_node):
@@ -124,6 +130,7 @@ class Graph():
         visited = set()
         nodes_stack = [(start,0)]
         while nodes_stack:
+            self.max_nodes.append(len(visited) + len(nodes_stack))
             current_node = nodes_stack.pop()
             self.nodes_expanded_count += 1
             if self.problem.is_goal_test(current_node[0]):
@@ -145,20 +152,21 @@ class Graph():
         self.edges[(self.problem.initial_state(), 0)] = dict()
         if start is None or start not in [x[0] for x in self.nodes]:
             return None
-        nodes_stack = [start]
+        nodes_stack = [(start,0)]
         while nodes_stack:
+            self.max_nodes.append(len(nodes_stack))
             current_node = nodes_stack.pop()
             self.nodes_expanded_count += 1
             if self.problem.is_goal_test(current_node[0]):
                 self.print_path(current_node[0])
-                return
+                return 'final'
             if current_node[1] != depth:
                 self.nodes_count += len(self.problem.actions(current_node[0]))
                 for node in self.problem.actions(current_node[0]):
                     self.insert(current_node, (node, current_node[1] + 1))
                     self.parent[node] = current_node[0]
                 nodes_stack.extend(set(self.edges[current_node].keys()))
-        return
+        return None
 
     def iddfs_graph_search(self,start):
         problem_depth = 1
@@ -166,6 +174,14 @@ class Graph():
         while not res:
             problem_depth += 1
             res = self.dfs_graph_limited_search(start, depth=problem_depth)
+
+
+    def iddfs_tree_search(self, start):
+        problem_depth = 1
+        res = self.dfs_tree_limited_search(start, depth=problem_depth)
+        while not res:
+            problem_depth += 1
+            res = self.dfs_tree_limited_search(start, depth=problem_depth)
 
 
     def bidirectional_graph_search(self,start,goal):
@@ -184,6 +200,7 @@ class Graph():
         nodes_stack = [start]
         nodes_second_stack = [goal]
         while nodes_stack or nodes_second_stack:
+            self.max_nodes.append(len(visited) + len(nodes_stack) +len(visited_second) + len(nodes_second_stack))
             current_node = nodes_stack.pop()
             self.nodes_expanded_count += 1
             print(current_node)
@@ -225,10 +242,11 @@ class Graph():
         #defining list for nodes, [node,g(n)]
         nodes = [[start, 0]]
         while nodes:
+            self.max_nodes.append(len(visited) + len(nodes))
             current_node = min(nodes, key=lambda k: k[1])
             self.nodes_expanded_count += 1
             visited.add(current_node[0])
-            if p.is_goal_test(current_node[0]):
+            if self.problem.is_goal_test(current_node[0]):
                 self.print_path(current_node[0])
                 return current_node[0]
             self.nodes_count += len(list(set(self.problem.actions(current_node[0]))))
@@ -247,9 +265,10 @@ class Graph():
         #defining list for nodes, [node,g(n)]
         nodes = [[start, 0]]
         while nodes:
+            self.max_nodes.append(len(nodes))
             current_node = min(nodes, key=lambda k: k[1])
             self.nodes_expanded_count += 1
-            if p.is_goal_test(current_node[0]):
+            if self.problem.is_goal_test(current_node[0]):
                 self.print_path(current_node[0])
                 return current_node[0]
             self.nodes_count += len(list(set(self.problem.actions(current_node[0]))))
@@ -270,10 +289,11 @@ class Graph():
         #defining list for nodes, [node,g(n),h(n)+g(n)]
         nodes = [[start,0,0]]
         while nodes:
+            self.max_nodes.append(len(visited) + len(nodes))
             current_node = min(nodes, key = lambda k : k[2])
             self.nodes_expanded_count += 1
             visited.add(current_node[0])
-            if p.is_goal_test(current_node[0]):
+            if self.problem.is_goal_test(current_node[0]):
                 self.print_path(current_node[0])
                 return current_node[0]
             self.nodes_count += len(list(set(self.problem.actions(current_node[0]))))
@@ -292,10 +312,11 @@ class Graph():
         #defining list for nodes, [node,g(n),h(n)+g(n)]
         nodes = [[start, 0, 0]]
         while nodes:
+            self.max_nodes.append(len(nodes))
             current_node = min(nodes, key=lambda k: k[2])
             self.nodes_expanded_count += 1
             print_table(current_node)
-            if p.is_goal_test(current_node[0]):
+            if self.problem.is_goal_test(current_node[0]):
                 self.print_path(current_node[0])
                 return current_node[0]
             self.nodes_count += len(list(set(self.problem.actions(current_node[0]))))
@@ -306,10 +327,3 @@ class Graph():
                 current_cost = list(filter(lambda element: element[0] == current_node[0], nodes))[0][1] + cost
                 nodes.append([node, current_cost, current_cost +self.problem.heuristic(node)])
             nodes.remove(current_node)
-
-p = Problem()
-g = Graph(p)
-# g.A_Star_graph_search(p.initial_state())
-g.iddfs_graph_search(p.initial_state())
-# g.dfs_graph_search((0,0))
-# g.dfs_graph_limited_search((0,0),6)
