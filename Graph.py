@@ -203,34 +203,28 @@ class Graph():
             self.max_nodes.append(len(visited) + len(nodes_stack) +len(visited_second) + len(nodes_second_stack))
             current_node = nodes_stack.pop()
             self.nodes_expanded_count += 1
-            print(current_node)
-            print('current_node')
-            print(current_node)
             if self.problem.is_goal_test(current_node):
                 print('FOUND!!!')
                 return
             if current_node not in visited:
                 visited.add(current_node)
                 self.nodes_count += len(self.problem.actions(current_node))
-                for node in self.problem.actions(current_node):
+                for node in list(set(self.problem.actions(current_node))-visited):
                     self.insert(current_node, node)
                 nodes_stack.extend(set(self.edges[current_node].keys()) - visited)
             current_node_second = nodes_second_stack.pop()
             self.nodes_expanded_count += 1
-            print(current_node_second)
-            print('current_node_second')
             if current_node_second == self.problem.initial_state():
                 print('FOUND!!!')
                 return
             if current_node_second not in visited_second:
                 visited_second.add(current_node_second)
                 self.nodes_count += len(self.problem.actions(current_node_second, straight=False))
-                for node in self.problem.actions(current_node_second,straight=False):
+                for node in list(set(self.problem.actions(current_node_second,straight=False))-visited_second):
                     self.insert(current_node_second, node)
                 nodes_second_stack.extend(set(self.edges[current_node_second].keys()) - visited_second)
             common_nodes = (set(nodes_stack) | set(visited)) & (set(nodes_second_stack) | set(visited_second))
             if len(common_nodes) > 0:
-                print('findout path :D')
                 return
         return visited
 
